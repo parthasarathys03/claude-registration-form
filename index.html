@@ -211,10 +211,45 @@
     }
 
     /* ── Responsive ── */
-    @media (max-width: 520px) {
-      .card { padding: 32px 22px; }
-      .row { flex-direction: column; gap: 0; }
+    @media (max-width: 600px) {
+      body { padding: 0 0 48px; }
+
+      .card {
+        padding: 32px 20px 36px;
+        border-radius: 0 0 20px 20px;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        box-shadow: 0 4px 24px rgba(204,120,92,0.08);
+      }
+
       .header h1 { font-size: 22px; }
+      .header p  { font-size: 13.5px; }
+
+      /* Stack first/last name vertically */
+      .row { flex-direction: column; gap: 0; }
+
+      /* Prevent iOS auto-zoom on focus (requires ≥16px) */
+      input[type="text"],
+      input[type="email"],
+      input[type="url"],
+      select,
+      textarea { font-size: 16px; padding: 13px 14px; }
+
+      /* Larger touch targets for checkboxes */
+      .check-field { padding: 4px 0; gap: 14px; }
+      .check-field input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; }
+      .check-field span { font-size: 14px; }
+
+      button[type="submit"] { padding: 16px; font-size: 16px; }
+
+      .section-label { margin-top: 26px; }
+    }
+
+    @media (max-width: 380px) {
+      .card { padding: 28px 16px 32px; }
+      .header h1 { font-size: 20px; }
+      .badge { font-size: 10.5px; }
     }
   </style>
 </head>
