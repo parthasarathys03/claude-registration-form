@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "_timestamp": "2026-05-04T10:14:18.449Z",
+    "form-name": "registration-form",
+    "First Name": "partha",
+    "Last Name": "sarathy",
+    "Email": "parthasarathysankar03@gmail.com",
+    "Claude Code Experience Level": "Never used it — curious to learn",
+    "Interested Features": "c",
+    "Work or Study": "c",
+    "Company Size": "201–1000",
+    "Role": "c",
+    "LinkedIn Profile": "c",
+    "GitHub Username": "c",
+    "Something Interesting": "c",
+    "Agree to Event Terms": "Yes",
+    "Newsletter Signup": "Yes",
+    "Speaker Interest": "Yes"
+  }
+]
