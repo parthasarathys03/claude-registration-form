@@ -270,16 +270,7 @@
     <p>Join fellow developers exploring Claude Code. Fill in your details below — fields marked <span style="color:#C4603F">*</span> are required.</p>
   </div>
 
-  <form
-    action="https://formsubmit.co/anithak@decisionminds.com"
-    method="POST"
-    novalidate
-  >
-    <!-- FormSubmit config -->
-    <input type="hidden" name="_subject" value="New Claude Code Meetup Registration" />
-    <input type="hidden" name="_captcha" value="false" />
-    <input type="hidden" name="_template" value="table" />
-    <input type="hidden" name="_next" value="https://parthasarathys03.github.io/claude-registration-form/thank-you.html" />
+  <form id="reg-form" novalidate>
 
     <!-- ── Personal Info ── -->
     <div class="section-label">Personal Info</div>
@@ -405,10 +396,75 @@
     <!-- ── Submit ── -->
     <div class="submit-wrap">
       <button type="submit">Submit</button>
-      <p class="footnote">Your response will be sent securely via FormSubmit.</p>
+      <p class="footnote">Your response will be sent securely.</p>
     </div>
 
   </form>
 </div>
+
+<script>
+  // ── Paste your Google Apps Script Web App URL here after setup ──
+  const SHEETS_URL = '';
+
+  const THANK_YOU = 'https://parthasarathys03.github.io/claude-registration-form/thank-you.html';
+
+  document.getElementById('reg-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Basic validation
+    const required = this.querySelectorAll('[required]');
+    let valid = true;
+    required.forEach(el => {
+      el.style.borderColor = '';
+      if ((el.type === 'checkbox' && !el.checked) || (el.type !== 'checkbox' && !el.value.trim())) {
+        el.style.borderColor = '#C4603F';
+        valid = false;
+      }
+    });
+    if (!valid) {
+      this.querySelector('[required]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+
+    // Build payload
+    const formData = new FormData(this);
+    const payload = { _timestamp: new Date().toISOString() };
+    formData.forEach((v, k) => { payload[k] = v; });
+
+    try {
+      // 1. Email via FormSubmit AJAX
+      await fetch('https://formsubmit.co/ajax/anithak@decisionminds.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ ...payload,
+          _subject: 'New Claude Code Meetup Registration',
+          _template: 'table'
+        })
+      });
+
+      // 2. Google Sheets — fire-and-forget (add SHEETS_URL to enable)
+      if (SHEETS_URL) {
+        fetch(SHEETS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          mode: 'no-cors'
+        }).catch(() => {});
+      }
+
+      // 3. Redirect to thank-you page
+      window.location.href = THANK_YOU;
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Submit';
+      alert('Something went wrong. Please try again.');
+    }
+  });
+</script>
 </body>
 </html>
