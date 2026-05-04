@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Review — Claude Code Meetup Registrations</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #FAF7F3;
+      color: #1C1917;
+      min-height: 100vh;
+      padding: 36px 24px 60px;
+    }
+    .top {
+      max-width: 1100px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .top h1 { font-size: 22px; font-weight: 700; color: #1C1917; }
+    .top h1 span { color: #CC785C; }
+    .meta { font-size: 13px; color: #78716C; margin-top: 2px; }
+
+    .actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: filter 0.18s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(160deg, #D4845F 0%, #BC6040 100%);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(188,96,64,0.25);
+    }
+    .btn-outline {
+      background: #FFFCF9;
+      color: #57534E;
+      border: 1.5px solid #EDE8E1;
+    }
+    .btn:hover { filter: brightness(1.07); }
+    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .card {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #FFFCF9;
+      border: 1px solid #EDE8E1;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(204,120,92,0.07);
+      overflow: hidden;
+    }
+
+    .empty, .loading, .error {
+      text-align: center;
+      padding: 64px 24px;
+      color: #A8A29E;
+      font-size: 15px;
+    }
+    .loading::before { content: "Loading…"; }
+    .error { color: #C4603F; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: #FDF9F6; border-bottom: 2px solid #EDE8E1; }
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #A8A29E;
+      white-space: nowrap;
+    }
+    td { padding: 12px 14px; border-bottom: 1px solid #F3EDE6; color: #292524; vertical-align: top; max-width: 220px; word-break: break-word; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FDF7F4; }
+
+    .badge-yes {
+      display: inline-block;
+      background: #D1FAE5; color: #065F46;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+    }
+    .count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #FDF0EA;
+      color: #A8513A;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 100px;
+      padding: 2px 10px;
+      border: 1px solid rgba(204,120,92,0.2);
+      margin-left: 8px;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 20px 12px 48px; }
+      .top { flex-direction: column; align-items: flex-start; }
+      .btn { padding: 10px 16px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <h1>Registrations <span id="count-badge"></span></h1>
+    <div class="meta" id="meta">Claude Code Meetup · HR Review Sheet</div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-outline" onclick="loadData()">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 00-1 1v14a1 1 0 001 1h12a1 1 0 001-1V7.414A2 2 0 0016.414 6L12 1.586A2 2 0 0010.586 1H4zm7 1.414L14.586 6H11V3.414zM5 9a1 1 0 000 2h10a1 1 0 100-2H5zm0 4a1 1 0 000 2h6a1 1 0 100-2H5z" clip-rule="evenodd"/></svg>
+      Refresh
+    </button>
+    <button class="btn btn-primary" id="dl-btn" onclick="downloadCSV()" disabled>
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      Download CSV
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <div id="content" class="loading"></div>
+</div>
+
+<script>
+  const RAW = 'https://raw.githubusercontent.com/parthasarathys03/claude-registration-form/main/data/submissions.json';
+
+  const COLS = [
+    { key: '_timestamp',                    label: 'Submitted At' },
+    { key: 'First Name',                    label: 'First Name' },
+    { key: 'Last Name',                     label: 'Last Name' },
+    { key: 'Email',                         label: 'Email' },
+    { key: 'Claude Code Experience Level',  label: 'Experience' },
+    { key: 'Role',                          label: 'Role' },
+    { key: 'Work or Study',                 label: 'Work / Study' },
+    { key: 'Company Size',                  label: 'Company Size' },
+    { key: 'Interested Features',           label: 'Interests' },
+    { key: 'LinkedIn Profile',              label: 'LinkedIn' },
+    { key: 'GitHub Username',               label: 'GitHub' },
+    { key: 'Something Interesting',         label: 'Something Interesting' },
+    { key: 'Agree to Event Terms',          label: 'Terms' },
+    { key: 'Newsletter Signup',             label: 'Newsletter' },
+    { key: 'Speaker Interest',              label: 'Speaker' },
+  ];
+
+  let allData = [];
+
+  async function loadData() {
+    document.getElementById('content').className = 'loading';
+    document.getElementById('content').textContent = '';
+    document.getElementById('dl-btn').disabled = true;
+    document.getElementById('count-badge').textContent = '';
+
+    try {
+      const res = await fetch(RAW + '?t=' + Date.now());
+      if (!res.ok) throw new Error('Could not load submissions file');
+      allData = await res.json();
+      render(allData);
+    } catch (err) {
+      document.getElementById('content').className = 'error';
+      document.getElementById('content').textContent = 'Error: ' + err.message;
+    }
+  }
+
+  function fmt(key, val) {
+    if (!val) return '<span style="color:#C7C0B8">—</span>';
+    if (val === 'Yes') return '<span class="badge-yes">Yes</span>';
+    if (key === '_timestamp') return new Date(val).toLocaleString();
+    if (key === 'LinkedIn Profile') return `<a href="${val}" target="_blank" style="color:#CC785C;word-break:break-all">${val}</a>`;
+    return val;
+  }
+
+  function render(data) {
+    const el = document.getElementById('content');
+
+    const badge = document.getElementById('count-badge');
+    badge.innerHTML = `<span class="count-badge">${data.length} total</span>`;
+    document.getElementById('meta').textContent =
+      data.length ? `Last submitted: ${new Date(data[data.length-1]._timestamp).toLocaleString()}` : 'No submissions yet';
+
+    if (!data.length) {
+      el.className = 'empty';
+      el.textContent = 'No registrations yet. Submissions will appear here automatically.';
+      return;
+    }
+
+    el.className = 'table-wrap';
+    el.innerHTML = `
+      <table>
+        <thead><tr>${COLS.map(c => `<th>${c.label}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${[...data].reverse().map(row =>
+            `<tr>${COLS.map(c => `<td>${fmt(c.key, row[c.key])}</td>`).join('')}</tr>`
+          ).join('')}
+        </tbody>
+      </table>`;
+
+    document.getElementById('dl-btn').disabled = false;
+  }
+
+  function downloadCSV() {
+    const headers = COLS.map(c => c.label);
+    const rows = allData.map(row =>
+      COLS.map(c => {
+        const v = row[c.key] || '';
+        return `"${String(v).replace(/"/g, '""')}"`;
+      })
+    );
+    const csv = [headers.map(h => `"${h}"`), ...rows].map(r => r.join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), {
+      href: url,
+      download: `registrations-${new Date().toISOString().slice(0,10)}.csv`
+    });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  loadData();
+</script>
+</body>
+</html>

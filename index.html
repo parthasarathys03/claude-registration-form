@@ -405,10 +405,37 @@
 </div>
 
 <script>
+  // ── GitHub config (paste your Fine-grained PAT below) ──
+  const GH_TOKEN = 'PASTE_YOUR_TOKEN_HERE';
+  const GH_OWNER = 'parthasarathys03';
+  const GH_REPO  = 'claude-registration-form';
+  const GH_FILE  = 'data/submissions.json';
+
+  async function saveToGitHub(entry) {
+    const api = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+    const headers = { 'Authorization': `token ${GH_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' };
+
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const res  = await fetch(api, { headers });
+      const file = await res.json();
+      const list = JSON.parse(atob(file.content.replace(/\n/g, '')));
+      list.push(entry);
+
+      const put = await fetch(api, {
+        method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'New registration', content: btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2)))), sha: file.sha })
+      });
+      if (put.status === 200 || put.status === 201) return;
+      if (put.status !== 409) throw new Error('GitHub write failed: ' + put.status);
+      // 409 = conflict (simultaneous submit) — retry
+      await new Promise(r => setTimeout(r, 300 + Math.random() * 400));
+    }
+    throw new Error('Too many conflicts, try again');
+  }
+
   document.getElementById('reg-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // Validation
     const required = this.querySelectorAll('[required]');
     let valid = true;
     required.forEach(el => {
@@ -418,43 +445,19 @@
         valid = false;
       }
     });
-    if (!valid) {
-      this.querySelector('[style]').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
+    if (!valid) { this.querySelector('[style]').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
 
     const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
 
     const formData = new FormData(this);
-
-    // Build JSON payload for FormSubmit email
-    const payload = { _timestamp: new Date().toISOString() };
-    formData.forEach((v, k) => { payload[k] = v; });
-
-    // Build URL-encoded body for Netlify Forms
-    const netlifyBody = new URLSearchParams({ 'form-name': 'registration-form' });
-    formData.forEach((v, k) => netlifyBody.append(k, v));
+    const entry = { _timestamp: new Date().toISOString() };
+    formData.forEach((v, k) => { if (!k.startsWith('bot')) entry[k] = v; });
 
     try {
-      // 1. Netlify Forms — stores every submission (CSV download from dashboard)
-      await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: netlifyBody.toString()
-      });
-
-      // 2. FormSubmit — sends email to anithak@decisionminds.com
-      await fetch('https://formsubmit.co/ajax/anithak@decisionminds.com', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ ...payload, _subject: 'New Claude Code Meetup Registration', _template: 'table' })
-      });
-
-      // 3. Redirect
+      await saveToGitHub(entry);
       window.location.href = 'thank-you.html';
-
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Submit';
