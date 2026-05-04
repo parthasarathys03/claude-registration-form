@@ -143,7 +143,7 @@
 </div>
 
 <script>
-  const RAW = 'https://raw.githubusercontent.com/parthasarathys03/claude-registration-form/main/data/submissions.json';
+  const API = 'https://api.github.com/repos/parthasarathys03/claude-registration-form/contents/data/submissions.json';
 
   const COLS = [
     { key: '_timestamp',                    label: 'Submitted At' },
@@ -172,9 +172,10 @@
     document.getElementById('count-badge').textContent = '';
 
     try {
-      const res = await fetch(RAW + '?t=' + Date.now());
+      const res = await fetch(API, { headers: { 'Accept': 'application/vnd.github.v3+json', 'Cache-Control': 'no-cache' } });
       if (!res.ok) throw new Error('Could not load submissions file');
-      allData = await res.json();
+      const file = await res.json();
+      allData = JSON.parse(atob(file.content.replace(/\n/g, '')));
       render(allData);
     } catch (err) {
       document.getElementById('content').className = 'error';
