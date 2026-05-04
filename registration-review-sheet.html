@@ -241,7 +241,9 @@
       const res = await fetch(API, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
       if (!res.ok) throw new Error('Could not load submissions (' + res.status + ')');
       const file = await res.json();
-      allData = JSON.parse(atob(file.content.replace(/\n/g, '')));
+      const binary = atob(file.content.replace(/\n/g, ''));
+      const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+      allData = JSON.parse(new TextDecoder('utf-8').decode(bytes));
       render(allData);
     } catch (err) {
       el.className = 'error';
