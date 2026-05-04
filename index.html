@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Code Meetup — Registration</title>
+  <style>
+    /* ── Claude brand tokens ─────────────────────────────────────
+       Coral:   #CC785C  (primary)
+       Warm bg: #FAF7F3  (page)
+       Card:    #FFFCF9
+       Border:  #EDE8E1
+       Text:    #1C1917  /  #57534E (muted)
+    ──────────────────────────────────────────────────────────── */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #FAF7F3;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 0%,  rgba(204,120,92,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(204,120,92,0.07) 0%, transparent 55%);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 16px 64px;
+      color: #1C1917;
+    }
+
+    .card {
+      background: #FFFCF9;
+      border-radius: 20px;
+      border: 1px solid #EDE8E1;
+      box-shadow:
+        0 2px 8px rgba(28,25,23,0.06),
+        0 12px 40px rgba(204,120,92,0.07);
+      width: 100%;
+      max-width: 560px;
+      padding: 48px 44px;
+    }
+
+    /* ── Header ── */
+    .header { margin-bottom: 36px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #FDF0EA;
+      color: #A8513A;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 5px 13px;
+      border-radius: 100px;
+      border: 1px solid rgba(204,120,92,0.25);
+      margin-bottom: 18px;
+    }
+
+    /* Claude "asterisk / sun" logomark drawn in SVG */
+    .badge .claude-mark {
+      width: 14px; height: 14px; flex-shrink: 0;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #1C1917;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .header p { font-size: 14px; color: #78716C; line-height: 1.65; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #A8A29E;
+      margin: 32px 0 18px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #EDE8E1;
+    }
+
+    /* ── Row ── */
+    .row { display: flex; gap: 14px; }
+    .row .field { flex: 1; }
+
+    /* ── Field ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #292524;
+      margin-bottom: 6px;
+    }
+    .field label .optional {
+      font-weight: 400;
+      color: #A8A29E;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    .field label .req { color: #C4603F; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1C1917;
+      background: #FDF9F6;
+      border: 1.5px solid #E7E0D8;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    input::placeholder,
+    textarea::placeholder { color: #B8B0A8; }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #CC785C;
+      box-shadow: 0 0 0 3px rgba(204,120,92,0.14);
+      background: #FFFCF9;
+    }
+
+    /* Select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "";
+      pointer-events: none;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #A8A29E;
+    }
+
+    textarea { resize: vertical; min-height: 88px; }
+
+    /* ── Checkbox ── */
+    .check-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .check-field input[type="checkbox"] {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      accent-color: #CC785C;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .check-field span {
+      font-size: 13.5px;
+      color: #44403C;
+      line-height: 1.55;
+    }
+    .check-field span a { color: #CC785C; text-decoration: none; }
+    .check-field span a:hover { text-decoration: underline; }
+    .check-field .opt-tag {
+      font-size: 11px;
+      color: #A8A29E;
+      margin-left: 4px;
+    }
+
+    /* ── Submit ── */
+    .submit-wrap { margin-top: 28px; }
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(160deg, #D4845F 0%, #BC6040 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: filter 0.18s, transform 0.1s;
+      letter-spacing: 0.01em;
+      box-shadow: 0 2px 12px rgba(188,96,64,0.30);
+    }
+    button[type="submit"]:hover  { filter: brightness(1.06); }
+    button[type="submit"]:active { transform: scale(0.99); filter: brightness(0.97); }
+
+    .footnote {
+      text-align: center;
+      font-size: 12px;
+      color: #A8A29E;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .card { padding: 32px 22px; }
+      .row { flex-direction: column; gap: 0; }
+      .header h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">
+      <!-- Claude asterisk / sunburst mark -->
+      <svg class="claude-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#A8513A" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="3" fill="#CC785C"/>
+      </svg>
+      Claude Code Community
+    </div>
+    <h1>Meetup Registration</h1>
+    <p>Join fellow developers exploring Claude Code. Fill in your details below — fields marked <span style="color:#C4603F">*</span> are required.</p>
+  </div>
+
+  <form
+    action="https://formsubmit.co/parthasarthysankar03@gmail.com"
+    method="POST"
+    novalidate
+  >
+    <!-- FormSubmit config -->
+    <input type="hidden" name="_subject" value="New Claude Code Meetup Registration" />
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_next" value="" />
+
+    <!-- ── Personal Info ── -->
+    <div class="section-label">Personal Info</div>
+
+    <div class="row">
+      <div class="field">
+        <label for="first_name">First Name <span class="req">*</span></label>
+        <input type="text" id="first_name" name="First Name" placeholder="Jane" required />
+      </div>
+      <div class="field">
+        <label for="last_name">Last Name <span class="req">*</span></label>
+        <input type="text" id="last_name" name="Last Name" placeholder="Doe" required />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">Email <span class="req">*</span></label>
+      <input type="email" id="email" name="Email" placeholder="you@email.com" required />
+    </div>
+
+    <!-- ── Claude Code Experience ── -->
+    <div class="section-label">Claude Code</div>
+
+    <div class="field">
+      <label for="experience">Experience level with Claude Code <span class="req">*</span></label>
+      <div class="select-wrap">
+        <select id="experience" name="Claude Code Experience Level" required>
+          <option value="" disabled selected>Select an option</option>
+          <option>Never used it — curious to learn</option>
+          <option>Beginner (tried a few times)</option>
+          <option>Intermediate (use it regularly)</option>
+          <option>Advanced (power user)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="interests">
+        Features / capabilities most interested in discussing
+        <span class="optional">(optional)</span>
+      </label>
+      <textarea id="interests" name="Interested Features" placeholder="e.g. MCP integrations, agentic workflows, IDE extensions…"></textarea>
+    </div>
+
+    <!-- ── Professional Info ── -->
+    <div class="section-label">Professional Info</div>
+
+    <div class="field">
+      <label for="workplace">
+        Where do you work or study?
+        <span class="optional">(optional)</span>
+      </label>
+      <input type="text" id="workplace" name="Work or Study" placeholder="Company / University" />
+    </div>
+
+    <div class="field">
+      <label for="employees">
+        Number of employees at your company
+        <span class="optional">(optional)</span>
+      </label>
+      <div class="select-wrap">
+        <select id="employees" name="Company Size">
+          <option value="" selected>Select an option</option>
+          <option>Just me (freelancer/solo)</option>
+          <option>2–10</option>
+          <option>11–50</option>
+          <option>51–200</option>
+          <option>201–1000</option>
+          <option>1000+</option>
+          <option>Student / Academic</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="role">
+        Your role
+        <span class="optional">(optional)</span>
+      </label>
+      <input type="text" id="role" name="Role" placeholder="Software Engineer, Designer, Student…" />
+    </div>
+
+    <!-- ── Links ── -->
+    <div class="section-label">Links &amp; Extras</div>
+
+    <div class="field">
+      <label for="linkedin">LinkedIn Profile <span class="req">*</span></label>
+      <input type="url" id="linkedin" name="LinkedIn Profile" placeholder="https://linkedin.com/in/yourname" required />
+    </div>
+
+    <div class="field">
+      <label for="github">
+        GitHub Username
+        <span class="optional">(optional)</span>
+      </label>
+      <input type="text" id="github" name="GitHub Username" placeholder="@yourhandle" />
+    </div>
+
+    <div class="field">
+      <label for="interesting">
+        Share something interesting — a project, link, or fun fact about yourself or Claude Code
+        <span class="optional">(optional)</span>
+      </label>
+      <textarea id="interesting" name="Something Interesting" placeholder="Tell us something cool…"></textarea>
+    </div>
+
+    <!-- ── Checkboxes ── -->
+    <label class="check-field">
+      <input type="checkbox" name="Agree to Event Terms" value="Yes" required />
+      <span>By registering, I agree to the <a href="#" target="_blank">event terms</a>. <span style="color:#ef4444">*</span></span>
+    </label>
+
+    <label class="check-field">
+      <input type="checkbox" name="Newsletter Signup" value="Yes" />
+      <span>I would like to receive the Claude Developer Newsletter from Anthropic. <span class="opt-tag">(optional)</span></span>
+    </label>
+
+    <label class="check-field">
+      <input type="checkbox" name="Speaker Interest" value="Yes" />
+      <span>Would you like to speak or present at the event? <span class="opt-tag">(optional)</span></span>
+    </label>
+
+    <!-- ── Submit ── -->
+    <div class="submit-wrap">
+      <button type="submit">Submit</button>
+      <p class="footnote">Your response will be sent securely via FormSubmit.</p>
+    </div>
+
+  </form>
+</div>
+</body>
+</html>
